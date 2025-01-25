@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multiple Text Files CRUD Operations</title>
+    <style>
+        #answer {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-top: 10px;
+            width: 300px;
+            height: 100px;
+            overflow: auto;
+            background-color: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+    <h1>Multiple Text Files CRUD Operations</h1>
+
+    <h2>Add Content</h2>
+    <textarea id="addContent" rows="4" cols="30" placeholder="Enter content to add..."></textarea><br>
+    <button id="addButton">Add</button>
+
+    <h2>Reset Content</h2>
+    <button id="resetButton">Reset</button> <!-- No file interaction -->
+
+    <h2>Get Answer from ans.txt</h2>
+    <button id="getAnsButton">Get Answer</button>
+    <div id="answer"></div>
+
+    <h2>Q&A Section</h2>
+    <textarea id="question" rows="2" cols="30" placeholder="Enter your question..."></textarea><br>
+    <button id="askButton">Ask</button>
+    <h3>Answer:</h3>
+    <div id="answer"></div>
+
+    <script>
+        document.getElementById('addButton').addEventListener('click', function() {
+            const content = document.getElementById('addContent').value;
+
+            fetch('/add', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ content: content })
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                document.getElementById('addContent').value = ''; // Clear input
+            })
+            .catch(error => console.error('Error:', error));
+        });
+
+        document.getElementById('resetButton').addEventListener('click', function() {
+            fetch('/reset', { method: 'POST' }) // No file parameter
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message); // Notify user of reset
+            })
+            .catch(error => console.error('Error:', error));
+        });
+
+        document.getElementById('getAnsButton').addEventListener('click', function() {
+            fetch('/get_ans')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('answer').innerText = data.content; // Display content from ans.txt
+            })
+            .catch(error => console.error('Error:', error));
+        });
+
+        document.getElementById('askButton').addEventListener('click', function() {
+            const question = document.getElementById('question').value;
+
+            fetch('/ask', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ question: question })
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('answer').innerText = data.message; // Display answer
+                document.getElementById('question').value = ''; // Clear question input
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    </script>
+</body>
+</html>
